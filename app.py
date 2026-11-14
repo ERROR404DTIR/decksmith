@@ -9,7 +9,7 @@ def render(src):
   x=line.strip()
   if not x:continue
   if x.startswith("#"):
-   m=re.match(r"^(#{1,3})\\s+(.*)",x)
+   m=re.match("^("+ "#" + "{1,3}) +(.*)",x)
    if m:out.append("<h%d>%s</h%d>"%(len(m[1]),html.escape(m[2]),len(m[1])))
   elif x.startswith("- "):out.append("<li>"+html.escape(x[2:])+"</li>")
   else:out.append("<p>"+html.escape(x)+"</p>")
@@ -19,7 +19,7 @@ def main():
  sample="# Welcome\\nMarkdown to slides\\n\\n---\\n\\n## Workflow\\n- Write Markdown\\n- Separate slides with dashes\\n\\n---\\n\\n# Questions?"
  if not a.input and not a.example:p.error("provide a Markdown file or --example")
  src=sample if a.example else Path(a.input).read_text(encoding="utf-8")
- parts=re.split(r"(?m)^\\s*---\\s*$",src.strip())
+ parts=re.split("(?m)^ *--- *$",src.strip())
  slides="".join('<section class="slide"><small>SLIDE %02d</small>%s</section>'%(i+1,render(v)) for i,v in enumerate(parts))
  page='<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Decksmith</title><style>'+CSS+'</style><main class="deck">'+slides+'<nav class="foot"><button onclick="prev()">←</button><button onclick="next()">→</button><span id="count"></span><progress max="%d" value="1"></progress><button id="full">Fullscreen</button></nav></main><script>'+JS+'</script>'%len(parts)
  Path(a.output).write_text(page,encoding="utf-8");print("Created",a.output)
